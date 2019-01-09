@@ -1,0 +1,157 @@
+﻿版本说明
+
+十三夜之月
+
+若你不在身旁 能上苍穹又怎样
+
+感谢我的助手牧濑红莉栖对我的帮助
+
+
+
+
+
+KBI初始化中内部上拉 已关闭
+
+拨码开关选择        完成
+
+电机死区补偿        完成
+
+平滑输出            完成
+
+速度环              完成
+
+串口                完成
+
+启动模式选择
+
+2018/1/23 更新日志 
+本次更新为功能性更新
+
+串口发送部分            已完成
+串口底层库更换为苏州大学版本,串口引脚选择在uart.h文件中
+新增函数:
+void Seed_Data(int value);                //发送格式化 即int→char
+void Send_0();                            //发送数据组0
+void Send_1();                            //发送数据组1
+void Send_2();                            //发送数据组2
+void Bluetooth(unsigned char Num);        //蓝牙发送调用函数
+函数位置:Interactive.c 147→193行 ,Interactive.h 19,20行 (原KEY.c,KEY.h)
+代码应用更改位置:
+main.c 19: uart_init(UART_1,9600);        //UART
+isr.c  48: Bluetooth(2);                  //选择发送数据组2
+
+启动模式框架部分        已完成
+新增函数:
+void Start_Mode(unsigned char value)      //启动模式选择
+函数位置:main.c 54
+代码应用更改位置:
+main.c 21:Dial_Switch_Init();             //拨码开关初始化
+main.c 22:Start_Mode(Dial_Switch_Read()); //选择启动模式
+
+其他更新
+Kalman.c 17,18 if语句块 → 条件运算符
+
+2018/1/23更新日志
+本次更新为错误修复
+修复BUG
+
+
+2018/1/29更新日志
+本次更新为功能性更新
+该版本为测试版
+Flash储存部分          已完成
+注:该版本仅完成Flash储存读取修改
+
+新增类型  :
+定义为共用体的FloatLongType的数据类型 Interactive.c 7
+新增结构体:
+结构体   Parameter
+对应结构 Transfer_Data;
+新增函数  :
+void Transfer_Data_Init(void)                    //传递参数初始化
+float Pass_Parameter(unsigned char Num)          //传递参数函数暂未应用
+void Key_Menu_Up(void) //G0                      //对应G0 功能菜单上翻
+void Key_Menu_Dn(void) //G1                      //对应G1 功能菜单下翻
+void Key_Value_Up(void) //G2                     //对应G2 功能参数值增
+void Key_Value_Dn(void) //G3                     //对应G3 功能参数值减
+short int Key_value_UpDn(void)                   //参数增减标准
+void Key_Dis(void)                               //按键用显示 调试用
+void Float_to_Byte(float f,unsigned char byte[]) //将浮点数f转化为4个字节数据存放在byte[4]中  
+void Byte_to_Float(float *f,unsigned char byte[])//将4个字节数据byte[4]转化为浮点数存放在*f中 
+void WriteFlash(void)                            //写Flash
+void ReadFlash(void)                             //读Flash
+以上函数位置均在文件Interactive.c
+
+关于参数调整
+1、拨码开关 拨为两位高电平
+2、重启
+使用菜单上翻键遍历一遍所有参数 完成一个周期 Stand_P→Stand_D→...→Steer_D_3→Stand_P 即可保存
+
+关于存储位置
+参数保存位置 255扇区 偏移0至40(该扇区为最末扇区)
+是否为第一次启动标志位 254扇区 偏移0
+
+2018/1/31更新日志
+本次更新，版本更新为正式版
+传递参数函数  float Pass_Parameter(unsigned char Num)  启用
+参与的控制参数     Num
+float Stand_P;  // 1 
+float Stand_D;  // 2
+float Speed_P;  // 3
+float Speed_I;  // 4
+float Steer_P_1;// 5
+float Steer_D_1;// 6
+float Steer_P_2;// 7
+float Steer_D_2;// 8
+float Steer_P_3;// 9
+float Steer_D_3;//10
+动态速度控制代码  构建中
+
+
+2018/2/1更新日志
+本次更新为功能性更新
+完成Fat文件系统搭建,功能性未测试
+使用SPI1通信 主机模式
+接线如下
+CLK  D0
+MISO D1
+MOSI D2
+CS   D3
+简单来说要是如果要用SD卡,现在可以用了
+注:需进行SPI初始化
+若要了解这个Fat文件系统的底层
+请参阅根目录下文件
+Porting-Fatfs-file-system-to-KL26-SPI-SD-code.pdf
+
+2018/2/12
+丁酉年最后一次更新
+
+所有基础代码完成
+
+( ゜- ゜)つロ 乾杯！！
+
+
+2018/2/28
+本次更新为功能性更新
+新增Flash重置
+另附 拨码开关 功能表  
+注: ↑ 表示靠近ON 
+1 2 功能
+↑ ↑ 定时中断10Ms 关闭终点停车
+↑ ↓ 重置Flash
+↓ ↑ 定时中断10Ms 启用终点停车
+↓ ↓ 调试模式
+
+Basic_Steer 存在一未知BUG
+Basic_Steer 无BUG 造成该BUG为程序运行时间大于中断时间
+
+
+该赛道大部分赛道函数通过arctan换算可以达到较好的效果，但是对于圆环未能找到一较为完善的连续的解决方案
+
+需要对圆环那一段路重新做一个中线拟合，可以说是可变中线
+
+
+
+
+
+
